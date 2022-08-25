@@ -1,4 +1,5 @@
 import { Controller, Delete, Get, Param, Post, Patch, Request } from '@nestjs/common';
+import { chargingType } from './client.entity';
 import { ClientService } from './clients.service';
 
 @Controller('client')
@@ -7,17 +8,19 @@ export class ClientController {
 
   @Get()
   async findAll(){
-    return this.clientService.findAll();
+    return await this.clientService.findAll();
   }
 
   @Get(':id')
   async findById(@Param('id') id:number){
-    return this.clientService.findById(id);
+    return await this.clientService.findById(id);
   }
 
   @Post('create')
   async create(@Request() req){
-    return this.clientService.create(req.body);
+    const client = req.body;
+    client.chargingType = chargingType[client.chargingType - 1];
+    return this.clientService.create(client);
   }
 
   @Delete(":id/delete")
@@ -27,6 +30,11 @@ export class ClientController {
   
   @Patch(':id/update')
   async update(@Param('id') id: number, @Request() req){
-    return this.clientService.update(id, req.body);
+    const client = req.body;
+    
+    client.chargingType = chargingType[client.chargingType - 1];
+    client.id = id;
+
+    return this.clientService.update(client);
   }
 }

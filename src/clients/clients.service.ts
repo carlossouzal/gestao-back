@@ -1,46 +1,32 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-
-export type Client = {
-  id?: number,
-  name: string,
-  phone: string,
-  cpfOrCnpj: string,
-  address: string,
-  complement: string
-};
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { Client } from './client.entity';
 
 @Injectable()
 export class ClientService {
-  private clients = [];
+  constructor(
+    @InjectRepository(Client)
+    private clientRepository: Repository<Client>
+  ){}
 
   async findAll(): Promise<Client[]>{
-    return this.clients;
+    return await this.clientRepository.find();
   }
 
   async create(client: Client): Promise<Client | null>{
-    client.id = Math.floor(Math.random() * Number.MAX_VALUE);
-    this.clients.push(client);
-    return client;
+    return await this.clientRepository.save(client);
   }
 
-  async delete(id: number): Promise<Client | null>{
-    const client = await this.findById(id);
-    this.clients = this.clients.filter(c => c !== client);    
-    return client;
+  async delete(id: number): Promise<DeleteResult>{
+    return await this.clientRepository.delete({id});
   }
 
   async findById(id:number): Promise<Client | null>{
-    const client = this.clients.find(client => client.id = id);
-    if(!client){
-      throw new HttpException('Client not found!', HttpStatus.NOT_FOUND);
-    }
-    return client;
+    return await this.clientRepository.findOneBy({id});
   }
 
-  async update(id:number, newClient: Client): Promise<Client | null>{
-    const client = await this.delete(id);
-    newClient.id = client.id;
-    this.clients.push(newClient);
-    return newClient;
+  async update(newClient: Client): Promise<Client>{
+    return await this.clientRepository.merge(newClient);
   }
 }

@@ -27,16 +27,21 @@ import { PriceDefault } from './defaultPrice/defaultPrice.entity';
 import { AwaitPrice } from './awaitPrice/awaitPrice.entity';
 import { BanksModule } from './banks/banks.module';
 import { EscalasModule } from './escalas/escalas.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: ".env.development",
+      isGlobal: true
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'infinity',
+      host: process.env.DATABASE_HOST,
+      port: parseInt(process.env.DATABASE_PORT),
+      username: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASS,
+      database: process.env.DATABASE_NAME,
       entities: [
         User,
         Client,

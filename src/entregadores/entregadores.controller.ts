@@ -1,4 +1,5 @@
-import { Controller, Delete, Get, Param, Patch, Post, Request } from '@nestjs/common';
+import { Controller, Delete, Get, HttpStatus, Param, ParseFilePipeBuilder, Patch, Post, Request, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { EntregadoresService } from './entregadores.service';
 
 @Controller('entregador')
@@ -19,6 +20,22 @@ export class EntregadoresController {
   async create(@Request() req){
     const entregador = req.body;
     return this.entregadorService.create(entregador);
+  }
+
+  @Post('create-file')
+  @UseInterceptors(FileInterceptor('file'))
+  async createWithFile(
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addMaxSizeValidator({
+          maxSize: 5242880
+        })
+        .build({
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
+        }),
+    ) file: Express.Multer.File
+  ){  
+    console.log(file);
   }
 
   @Delete(":id/delete")

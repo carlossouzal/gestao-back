@@ -32,7 +32,7 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ".env.development",
+      envFilePath: ".env",
       isGlobal: true
     }),
     TypeOrmModule.forRoot({
